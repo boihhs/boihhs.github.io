@@ -174,6 +174,7 @@
     <div class="container">
         <h1>Memory Sequence Trainer</h1>
         <div id="levelDisplay">Level: <span id="level">1</span></div>
+        <div id="highScoreDisplay">High Score: <span id="highScore">0</span></div>
         <div id="sequenceDisplay" class="bg-gray-800 text-white rounded-md p-4 mb-4"></div>
         <input type="text" id="userInput" class="bg-gray-700 text-white rounded-md p-3 mb-4 w-full focus:ring-2 focus:ring-purple-500" placeholder="Enter the sequence here..." />
         <div id="message" class="text-yellow-300 mb-4 min-h-[1.5em]"></div>
@@ -200,6 +201,7 @@
         let gameRunning = false;
         let sequenceType = 'alphanumeric'; // Changed default sequence type
         let timeoutId;
+        let highScore = parseInt(localStorage.getItem('memoryHighScore')) || 0; // Load from local storage
 
         const sequenceDisplay = document.getElementById('sequenceDisplay');
         const userInput = document.getElementById('userInput');
@@ -209,6 +211,10 @@
         const refreshButton = document.getElementById('refreshButton');
         const levelDisplay = document.getElementById('levelDisplay');
         const levelSpan = document.getElementById('level');
+        const highScoreDisplay = document.getElementById('highScore');
+        const highScoreSpan = document.getElementById('highScoreSpan'); // Corrected ID
+
+        highScoreDisplay.textContent = highScore; // Initial display of high score
 
         startButton.addEventListener('click', startGame);
         checkButton.addEventListener('click', checkInput);
@@ -238,12 +244,19 @@
             const userGuess = userInput.value.trim();
             message.textContent = ''; // Clear previous messages
 
-            if (userGuess.toUpperCase() === sequence.toUpperCase()) { //changed this line
+            if (userGuess.toUpperCase() === sequence.toUpperCase()) {
                 message.textContent = 'Correct!';
                 level++;
                 levelSpan.textContent = level;
                 memorizationTime *= 0.9; // Reduce time, making it harder
                 gameRunning = false; // Set gameRunning to false before starting again
+
+                if (level > highScore) { // Check for new high score
+                    highScore = level;
+                    highScoreDisplay.textContent = highScore; // Update display
+                    localStorage.setItem('memoryHighScore', highScore); // Save to local storage
+                }
+
                 setTimeout(startGame, 1000); // Start next level after delay
             } else {
                 message.textContent = 'Incorrect, try again!';
